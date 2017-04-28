@@ -1,0 +1,318 @@
+From c005894571b587c65e912c5a83ac1635e011743a Mon Sep 17 00:00:00 2001
+From: nickboldt <nboldt@redhat.com>
+Date: Tue, 11 Apr 2017 15:35:26 -0400
+Subject: [PATCH] add root pom to Rob's .all merged repo fork (untested, can't
+ build until I have missing deps resolved -
+ org.eclipse.wst.common_sdk.feature.feature.group ->
+ org.eclipse.wst.common.modulecore.ui -> org.eclipse.wst.server.core
+
+fix relative path to wtp-parent
+
+Signed-off-by: nickboldt <nboldt@redhat.com>
+
+replace pom.xml-based plugin dep with MANIFEST.MF-based dep
+
+Signed-off-by: nickboldt <nboldt@redhat.com>
+
+add update site builder
+
+Signed-off-by: nickboldt <nboldt@redhat.com>
+
+add gitignores for test jars; add WTP site to resolve upstream deps; clean up category.xml
+
+Signed-off-by: nickboldt <nboldt@redhat.com>
+---
+ .gitignore                                         |  1 +
+ pom.xml                                            | 46 ++++++++++++++++++++++
+ site/category.xml                                  | 24 +++++++++++
+ site/pom.xml                                       | 25 ++++++++++++
+ webtools.common.fproj/pom.xml                      |  2 +-
+ .../.gitignore                                     |  1 +
+ .../.gitignore                                     |  1 +
+ .../.gitignore                                     |  1 +
+ webtools.common.snippets/pom.xml                   |  2 +-
+ webtools.common.tests/pom.xml                      |  2 +-
+ .../.gitignore                                     |  1 +
+ .../org.eclipse.wst.common.tests.ui/.gitignore     |  1 +
+ .../META-INF/MANIFEST.MF                           |  1 +
+ .../pom.xml                                        | 19 ---------
+ .../tests/org.eclipse.wst.common.tests/.gitignore  |  1 +
+ .../.gitignore                                     |  1 +
+ webtools.common/pom.xml                            |  2 +-
+ 17 files changed, 108 insertions(+), 23 deletions(-)
+ create mode 100644 .gitignore
+ create mode 100644 pom.xml
+ create mode 100644 site/category.xml
+ create mode 100644 site/pom.xml
+ create mode 100644 webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.core.tests/.gitignore
+ create mode 100644 webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.ui.tests/.gitignore
+ create mode 100644 webtools.common.snippets/org.eclipse.wst.common.snippets.tests/.gitignore
+ create mode 100644 webtools.common.tests/tests/org.eclipse.wst.common.tests.collector/.gitignore
+ create mode 100644 webtools.common.tests/tests/org.eclipse.wst.common.tests.ui/.gitignore
+ create mode 100644 webtools.common.tests/tests/org.eclipse.wst.common.tests/.gitignore
+ create mode 100644 webtools.common.tests/tests/org.eclipse.wst.internet.cache.tests/.gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..2f7896d
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1 @@
++target/
+diff --git a/pom.xml b/pom.xml
+new file mode 100644
+index 0000000..f9e5803
+--- /dev/null
++++ b/pom.xml
+@@ -0,0 +1,46 @@
++<project
++	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
++	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++	<modelVersion>4.0.0</modelVersion>
++	<parent>
++		<groupId>org.eclipse</groupId>
++		<artifactId>wtp-parent</artifactId>
++		<version>3.6.0-SNAPSHOT</version>
++		<relativePath>../wtp-parent</relativePath>
++	</parent>
++	<groupId>org.eclipse.webtools.common.all</groupId>
++	<artifactId>org.eclipse.webtools.common.all</artifactId>
++	<version>3.6.0-SNAPSHOT</version>
++	<packaging>pom</packaging>
++	<modules>
++		<module>webtools.common</module>
++		<module>webtools.common.fproj</module>
++		<module>webtools.common.snippets</module>
++		<module>webtools.common.tests</module>
++		<module>site</module>
++	</modules>
++	<repositories>
++		<repository>
++			<id>webtools-390M6</id>
++			<url>http://download.eclipse.org/webtools/downloads/drops/R3.9.0/S-3.9.0M6-20170314000054/repository/</url>
++			<layout>p2</layout>
++		</repository>
++		<repository>
++			<id>webtools-I-3.9.0-20170411000049</id>
++			<url>http://download.eclipse.org/webtools/downloads/drops/R3.9.0/I-3.9.0-20170411000049/repository/</url>
++			<layout>p2</layout>
++		</repository>
++		<repository>
++			<id>jboss-public-repository-group</id>
++			<name>JBoss Public Repository Group</name>
++			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
++			<releases>
++				<enabled>true</enabled>
++			</releases>
++			<snapshots>
++				<enabled>true</enabled>
++			</snapshots>
++		</repository>
++	</repositories>
++</project>
++	
+diff --git a/site/category.xml b/site/category.xml
+new file mode 100644
+index 0000000..15e2db9
+--- /dev/null
++++ b/site/category.xml
+@@ -0,0 +1,24 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<site>
++    <feature id="org.eclipse.wst.common_ui.feature" version="0.0.0"><category name="common"/></feature>
++    <feature id="org.eclipse.wst.common_core.feature" version="0.0.0"><category name="common"/></feature>
++    <feature id="org.eclipse.jst.common.fproj.enablement.jdt" version="0.0.0"><category name="common"/></feature>
++    <feature id="org.eclipse.wst.common.fproj" version="0.0.0"><category name="common"/></feature>
++
++    <feature id="org.eclipse.wst.common_sdk.feature" version="0.0.0"><category name="common.sdk"/></feature>
++    <feature id="org.eclipse.wst.common.fproj.sdk" version="0.0.0"><category name="common.sdk"/></feature>
++    <feature id="org.eclipse.jst.common.fproj.enablement.jdt.sdk" version="0.0.0"><category name="common.sdk"/></feature>
++     
++    <feature id="org.eclipse.wst.common_tests.feature" version="0.0.0"><category name="common.tests"/></feature>
++
++    <category-def name="common" label="Web Tools Platform (WTP) Common"><description>
++    Common plugins shared by WTP features
++    </description></category-def>
++    <category-def name="common.sdk" label="Web Tools Platform (WTP) Common SDK"><description>
++    These features provide functionality with the executable code and the source code and are recommended for those extending or debugging WTP.
++    </description></category-def>
++    <category-def name="common.tests" label="Web Tools Platform (WTP) Common Tests"><description>
++    These features provide Unit tests for WTP. WTP Committers, or others testing WTP, will need these in at least their PDE Targets.
++    </description></category-def>
++
++</site>
+diff --git a/site/pom.xml b/site/pom.xml
+new file mode 100644
+index 0000000..1db186f
+--- /dev/null
++++ b/site/pom.xml
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  Copyright (c) 2017 Red Hat Inc.
++  All rights reserved. This program and the accompanying materials
++  are made available under the terms of the Eclipse Distribution License v1.0
++  which accompanies this distribution, and is available at
++  http://www.eclipse.org/org/documents/edl-v10.php
++ 
++  Contributors:
++    Nick Boldt (Red Hat Inc.) - initial implementation
++-->
++
++<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
++    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++  <modelVersion>4.0.0</modelVersion>
++  <parent>
++    <groupId>org.eclipse.webtools.common.all</groupId>
++    <artifactId>org.eclipse.webtools.common.all</artifactId>
++    <version>3.6.0-SNAPSHOT</version>
++  </parent>
++
++  <groupId>org.eclipse.webtools.common</groupId>
++  <artifactId>org.eclipse.webtools.common.site</artifactId>
++  <packaging>eclipse-repository</packaging>
++</project>
+diff --git a/webtools.common.fproj/pom.xml b/webtools.common.fproj/pom.xml
+index c05a09e..fa0b015 100644
+--- a/webtools.common.fproj/pom.xml
++++ b/webtools.common.fproj/pom.xml
+@@ -18,7 +18,7 @@
+     <groupId>org.eclipse</groupId>
+     <artifactId>wtp-parent</artifactId>
+     <version>3.6.0-SNAPSHOT</version>
+-    <relativePath>../wtp-parent</relativePath>
++    <relativePath>../../wtp-parent</relativePath>
+   </parent>
+ 
+   <groupId>org.eclipse.webtools.common</groupId>
+diff --git a/webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.core.tests/.gitignore b/webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.core.tests/.gitignore
+new file mode 100644
+index 0000000..6faf6b0
+--- /dev/null
++++ b/webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.core.tests/.gitignore
+@@ -0,0 +1 @@
++tests.jar
+diff --git a/webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.ui.tests/.gitignore b/webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.ui.tests/.gitignore
+new file mode 100644
+index 0000000..6faf6b0
+--- /dev/null
++++ b/webtools.common.fproj/tests/org.eclipse.wst.common.project.facet.ui.tests/.gitignore
+@@ -0,0 +1 @@
++tests.jar
+diff --git a/webtools.common.snippets/org.eclipse.wst.common.snippets.tests/.gitignore b/webtools.common.snippets/org.eclipse.wst.common.snippets.tests/.gitignore
+new file mode 100644
+index 0000000..5c5be23
+--- /dev/null
++++ b/webtools.common.snippets/org.eclipse.wst.common.snippets.tests/.gitignore
+@@ -0,0 +1 @@
++snippetstests.jar
+diff --git a/webtools.common.snippets/pom.xml b/webtools.common.snippets/pom.xml
+index 945fb26..3eb6be2 100644
+--- a/webtools.common.snippets/pom.xml
++++ b/webtools.common.snippets/pom.xml
+@@ -18,7 +18,7 @@
+     <groupId>org.eclipse</groupId>
+     <artifactId>wtp-parent</artifactId>
+     <version>3.6.0-SNAPSHOT</version>
+-    <relativePath>../wtp-parent</relativePath>
++    <relativePath>../../wtp-parent</relativePath>
+   </parent>
+ 
+   <groupId>org.eclipse.webtools.common</groupId>
+diff --git a/webtools.common.tests/pom.xml b/webtools.common.tests/pom.xml
+index 206e19a..cefe7bf 100644
+--- a/webtools.common.tests/pom.xml
++++ b/webtools.common.tests/pom.xml
+@@ -18,7 +18,7 @@
+     <groupId>org.eclipse</groupId>
+     <artifactId>wtp-parent</artifactId>
+     <version>3.6.0-SNAPSHOT</version>
+-    <relativePath>../wtp-parent</relativePath>
++    <relativePath>../../wtp-parent</relativePath>
+   </parent>
+ 
+   <groupId>org.eclipse.webtools.common</groupId>
+diff --git a/webtools.common.tests/tests/org.eclipse.wst.common.tests.collector/.gitignore b/webtools.common.tests/tests/org.eclipse.wst.common.tests.collector/.gitignore
+new file mode 100644
+index 0000000..712f264
+--- /dev/null
++++ b/webtools.common.tests/tests/org.eclipse.wst.common.tests.collector/.gitignore
+@@ -0,0 +1 @@
++runtime/
+diff --git a/webtools.common.tests/tests/org.eclipse.wst.common.tests.ui/.gitignore b/webtools.common.tests/tests/org.eclipse.wst.common.tests.ui/.gitignore
+new file mode 100644
+index 0000000..5b51b5b
+--- /dev/null
++++ b/webtools.common.tests/tests/org.eclipse.wst.common.tests.ui/.gitignore
+@@ -0,0 +1 @@
++ui.jar
+diff --git a/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/META-INF/MANIFEST.MF b/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/META-INF/MANIFEST.MF
+index 36d46b6..333780f 100644
+--- a/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/META-INF/MANIFEST.MF
++++ b/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/META-INF/MANIFEST.MF
+@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.ui,
+  org.eclipse.wst.validation,
+  org.junit;bundle-version="3.8.2",
+  org.eclipse.core.resources,
++ org.eclipse.jst.common.project.facet.core,
+  org.eclipse.wst.common.project.facet.core;bundle-version="[1.3.0,2.0.0)"
+ Bundle-RequiredExecutionEnvironment: J2SE-1.5
+ Bundle-ActivationPolicy: lazy
+diff --git a/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/pom.xml b/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/pom.xml
+index 8ff1202..31c5899 100644
+--- a/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/pom.xml
++++ b/webtools.common.tests/tests/org.eclipse.wst.common.tests.validation/pom.xml
+@@ -29,23 +29,4 @@
+     <testSuite>${project.artifactId}</testSuite>
+     <testClass>org.eclipse.wst.validation.tests.testcase.ValidationTestSuite</testClass>
+   </properties>
+-
+-  <build>
+-    <plugins>
+-      <plugin>
+-        <groupId>org.eclipse.tycho</groupId>
+-        <artifactId>tycho-surefire-plugin</artifactId>
+-        <version>${tycho.version}</version>
+-        <configuration>
+-          <dependencies>
+-            <dependency>
+-              <type>p2-installable-unit</type>
+-              <groupId>org.eclipse.webtools.common</groupId>
+-              <artifactId>org.eclipse.jst.common.project.facet.core</artifactId>
+-            </dependency>
+-          </dependencies>
+-        </configuration>
+-      </plugin>
+-    </plugins>
+-  </build>
+ </project>
+diff --git a/webtools.common.tests/tests/org.eclipse.wst.common.tests/.gitignore b/webtools.common.tests/tests/org.eclipse.wst.common.tests/.gitignore
+new file mode 100644
+index 0000000..fa10bda
+--- /dev/null
++++ b/webtools.common.tests/tests/org.eclipse.wst.common.tests/.gitignore
+@@ -0,0 +1 @@
++commontests.jar
+diff --git a/webtools.common.tests/tests/org.eclipse.wst.internet.cache.tests/.gitignore b/webtools.common.tests/tests/org.eclipse.wst.internet.cache.tests/.gitignore
+new file mode 100644
+index 0000000..6faf6b0
+--- /dev/null
++++ b/webtools.common.tests/tests/org.eclipse.wst.internet.cache.tests/.gitignore
+@@ -0,0 +1 @@
++tests.jar
+diff --git a/webtools.common/pom.xml b/webtools.common/pom.xml
+index 7e8b94d..15e69d2 100644
+--- a/webtools.common/pom.xml
++++ b/webtools.common/pom.xml
+@@ -18,7 +18,7 @@
+     <groupId>org.eclipse</groupId>
+     <artifactId>wtp-parent</artifactId>
+     <version>3.6.0-SNAPSHOT</version>
+-    <relativePath>../wtp-parent</relativePath>
++    <relativePath>../../wtp-parent</relativePath>
+   </parent>
+ 
+   <groupId>org.eclipse.webtools.common</groupId>
+-- 
+2.7.4
+
