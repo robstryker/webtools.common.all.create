@@ -82,7 +82,11 @@ postClone() {
 }
 
 applyPatches() {
-    echo "Hello"
+    echo ""
+    echo "Applying patches"
+    git checkout master
+    git am --ignore-whitespace ../../0001-add-root-pom-to-Rob-s-.all-merged-repo-fork-untested.patch
+    git am --ignore-whitespace ../../0001-Patch-for-Eclipse-Bugzilla-511793-JBIDE-24220-applie.patch
 }
 
 
